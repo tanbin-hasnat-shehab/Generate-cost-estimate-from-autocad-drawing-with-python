@@ -1,0 +1,1588 @@
+from RSEPS_requests_module import*
+import pypyodbc
+#rseps=RSEPS(location='RUMA',scheme_name='from class')
+con_string = r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};'\
+                          r'DBQ=C:\RSEPS_2022\ss.mdb;'
+
+conn = pypyodbc.connect(con_string)
+     
+cursor = conn.cursor()
+cursor.execute('SELECT * FROM Summary')
+str_all_data=cursor.fetchall()
+column_names=[column[0] for column in cursor.description]
+#print(column_names)
+
+
+
+def tube_well_fn(index,block):
+	if block['visibility1']=='Tube Well':
+
+		length_steps=int(block['depth_t']/50)
+		if block['depth_t']>250:
+			fraction_length=block['depth_t']-250
+		else:
+			fraction_length=block['depth_t']-length_steps*50
+		c=''
+		for i in range(length_steps):
+			if i==0:
+				rseps.input_data(estimate_input=['10.02.1',serial(index),0,
+					f'Tube well No {block["id_t"]}, 0-50 m',
+					50,None,None,50,block['no_of_item']])
+				c='10.02.1'
+			if i==1:
+				rseps.input_data(estimate_input=['10.02.2',serial(index),0,
+					f'Tube well No {block["id_t"]} , 50-100 m',
+					50,None,None,50,block['no_of_item']])
+				c='10.02.2'
+			if i==2:
+				rseps.input_data(estimate_input=['10.02.3',serial(index),0,
+					f'Tube well No {block["id_t"]} , 100-150 m',
+					50,None,None,50,block['no_of_item']])
+				c='10.02.3'
+			if i==3:
+				rseps.input_data(estimate_input=['10.02.4',serial(index),0,
+					f'Tube well No {block["id_t"]} , 150-200 m',
+					50,None,None,50,block['no_of_item']])
+				c='10.02.4'
+			if i==4:
+				rseps.input_data(estimate_input=['10.02.5',serial(index),0,
+					f'Tube well No {block["id_t"]} , 200-250 m',
+					50,None,None,50,block['no_of_item']])
+				c='10.02.5'
+		l1=c.split('.')
+		code_last='10.'+'02.'+str(int(c[-1])+1)
+		if fraction_length!=0:
+			rseps.input_data(estimate_input=[code_last,serial(index),0,
+					f'Tube well No {block["id_t"]} , up to {block["depth_t"]} m',
+					fraction_length,None,None,fraction_length,block['no_of_item']])
+
+		rseps.input_data(estimate_input=['10.03.1',serial(index),0,
+			f'Tube well No {block["id_t"]}',
+			None,None,None,1,block['no_of_item']])
+
+		rseps.input_data(estimate_input=['10.03.2',serial(index),0,
+			f'Tube well No {block["id_t"]}',
+			block['gi_pipe_t'],None,None,block['gi_pipe_t'],block['no_of_item']])
+
+		rseps.input_data(estimate_input=['10.03.3',serial(index),0,
+			f'Tube well No {block["id_t"]}',
+			block['depth_t'],None,None,block['depth_t'],block['no_of_item']])
+
+		rseps.input_data(estimate_input=['10.03.4',serial(index),0,
+			f'Tube well No {block["id_t"]}',
+			block['strainer_length_t'],None,None,block['strainer_length_t'],block['no_of_item']])
+		if block['platform_t']=='true':
+			rseps.input_data(estimate_input=['10.80',serial(index),0,
+			f'Tube well No {block["id_t"]}',
+			None,None,None,1,block['no_of_item']])
+
+	if block['visibility1']=='Submerssible Pump':
+
+		length_steps=int(block['depth_s']/50)
+		if block['hp_s']<=1:
+			bore_dia=['10.02.1','10.02.2','10.02.3','10.02.4','10.02.5','10.02.6']
+			pump_code='8.12.3.1'
+			mid_code='02.'
+			pipe_code='10.03.3'
+			strainer_code='10.03.4'
+		else:
+			bore_dia=['10.26.1','10.26.2','10.26.3','10.26.4','10.26.5','10.26.6']
+			mid_code='26.'
+			pipe_code='10.27.2.1'
+			strainer_code='10.27.3.1'
+			if block['hp_s']==1.5:
+				pump_code='8.12.3.2'
+			else:
+				pump_code='8.12.3.3'
+		if block['depth_s']>250:
+			fraction_length=block['depth_s']-250
+		else:
+			fraction_length=block['depth_s']-length_steps*50
+		c=''
+		for i in range(length_steps):
+			if i==0:
+				rseps.input_data(estimate_input=[bore_dia[0],serial(index),0,
+					f'Submersible No {block["id_s"]}, 0-50 m',
+					50,None,None,50,block['no_of_item']])
+				c=bore_dia[0]
+			if i==1:
+				rseps.input_data(estimate_input=[bore_dia[1],serial(index),0,
+					f'Submersible No {block["id_s"]} , 50-100 m',
+					50,None,None,50,block['no_of_item']])
+				c=bore_dia[1]
+			if i==2:
+				rseps.input_data(estimate_input=[bore_dia[2],serial(index),0,
+					f'Submersible No {block["id_s"]} , 100-150 m',
+					50,None,None,50,block['no_of_item']])
+				c=bore_dia[2]
+			if i==3:
+				rseps.input_data(estimate_input=[bore_dia[3],serial(index),0,
+					f'Submersible No {block["id_s"]} , 150-200 m',
+					50,None,None,50,block['no_of_item']])
+				c=bore_dia[3]
+			if i==4:
+				rseps.input_data(estimate_input=[bore_dia[4],serial(index),0,
+					f'Submersible No {block["id_s"]} , 200-250 m',
+					50,None,None,50,block['no_of_item']])
+				c=bore_dia[4]
+		l1=c.split('.')
+		code_last='10.'+mid_code+str(int(c[-1])+1)
+		if fraction_length!=0:
+			rseps.input_data(estimate_input=[code_last,serial(index),0,
+					f'Submersible No {block["id_s"]} , up to {block["depth_s"]} m',
+					fraction_length,None,None,fraction_length,block['no_of_item']])
+
+
+		rseps.input_data(estimate_input=['10.03.2',serial(index),0,
+			f'Submersible Pump No {block["id_s"]}',
+			block['gi_pipe_s'],None,None,block['gi_pipe_s'],block['no_of_item']])
+
+		rseps.input_data(estimate_input=[pipe_code,serial(index),0,
+			f'Submersible Pump No {block["id_s"]}',
+			block['depth_s'],None,None,block['depth_s'],block['no_of_item']])
+
+		rseps.input_data(estimate_input=[strainer_code,serial(index),0,
+			f'Submersible Pump No {block["id_s"]}',
+			block['strainer_length_s'],None,None,block['strainer_length_s'],block['no_of_item']])
+
+		rseps.input_data(estimate_input=[pump_code,serial(index),0,
+			f'Submersible Pump No {block["id_s"]}',
+			None,None,None,1,block['no_of_item']])
+		
+
+
+
+#definition_here
+
+
+
+def CI_sheet_triangle_fn(index,a):
+	rseps.input_data(estimate_input=['5.09.01.21',serial(index),0,f'CI sheet galvanized white at {a["id"]}: 0.5x{a["length"]}x0.42x{a["length"]}',0.5*a['length'],0.42*a['length'],None,0.5*(a['length'])*0.42*(a['length']),a['no_of_item']])
+		
+
+def CI_sheet_ridge(index,a):
+	if a['color']=='galvanized':
+		rseps.input_data(estimate_input=['5.09.01.21',serial(index),0,f'CI sheet galvanized white at {a["id"]}',a['length'],a['width'],None,a['length']*a['width'],a['no_of_item']])
+	else:
+		
+		rseps.input_data(estimate_input=['5.09.01.21',serial(index),0,f'CI sheet galvanized white at {a["id"]}',a['length'],a['width'],None,a['length']*a['width'],a['no_of_item']])
+
+def CI_ridge(index,a):
+	
+	rseps.input_data(estimate_input=['5.09.01.22.1',serial(index),0,f'CI sheet ridging 300mm at {a["id"]}',a['length'],None,None,a['length'],a['no_of_item']])
+
+
+
+def DOOR(index,a):
+	if a['cost_level']=='low':
+		if a['type']=='wooden':
+			
+			rseps.input_data(estimate_input=['5.07.09.1',serial(index),0,f'door frame of MS angle at Door-{a["id"]}',a['door_width']+2*a['door_height'],None,None,a['door_width']+2*a['door_height'],a['no_of_item']])
+			
+			rseps.input_data(estimate_input=['5.16.02',serial(index),0,f'paint to MS angle door frame at Door-{a["id"]}',a['door_width']+2*a['door_height'],0.05,None,(a['door_width']+2*a['door_height'])*0.05,a['no_of_item']])
+			
+			rseps.input_data(estimate_input=['5.08.01.3',serial(index),0,f'door shutter Gamari at Door-{a["id"]}',a['door_width'],a['door_height'],None,a['door_width']*a['door_height'],a['no_of_item']])
+
+			
+			rseps.input_data(estimate_input=['5.16.11.1',serial(index),0,f'door shutter varnishing at Door-{a["id"]}',a['door_width'],a['door_height'],None,a['door_width']*a['door_height'],2*a['no_of_item']])
+
+
+
+
+		if a['type']=='wooden_with_mortrice_lock':
+			
+			rseps.input_data(estimate_input=['5.07.09.1',serial(index),0,f'door frame of MS angle at Door-{a["id"]}',a['door_width']+2*a['door_height'],None,None,a['door_width']+2*a['door_height'],1*a['no_of_item']])
+			
+			rseps.input_data(estimate_input=['5.16.02',serial(index),0,f'paint to MS angle door frame at Door-{a["id"]}',a['door_width']+2*a['door_height'],0.05,None,(a['door_width']+2*a['door_height'])*0.05,1*a['no_of_item']])
+			
+			rseps.input_data(estimate_input=['5.08.01.3',serial(index),0,f'door shutter Gamari at Door-{a["id"]}',a['door_width'],a['door_height'],None,a['door_width']*a['door_height'],1*a['no_of_item']])
+
+			
+			rseps.input_data(estimate_input=['5.16.11.1',serial(index),0,f'door shutter varnishing at Door-{a["id"]}',a['door_width'],a['door_height'],None,a['door_width']*a['door_height'],2*a['no_of_item']])
+
+			
+			rseps.input_data(estimate_input=['5.08.21.1',serial(index),0,f'mortrice lock at Door-{a["id"]}',None,None,None,1,1*a['no_of_item']])
+			rseps.input_data(estimate_input=['5.08.24.1',serial(index),0,f'magnetic door holder at Door-{a["id"]}',None,None,None,1,1*a['no_of_item']])
+			rseps.input_data(estimate_input=['5.08.25',serial(index),0,f'25mm eye viewer at Door-{a["id"]}',None,None,None,1,1*a['no_of_item']])
+
+
+		if a['type']=='glass_door':
+			
+			
+			rseps.input_data(estimate_input=['5.20.20.1',serial(index),0,f'tempered glass door at Door-{a["id"]}',a['door_width'],a['door_height'],None,a['door_width']*a['door_height'],1*a['no_of_item']])
+			
+			rseps.input_data(estimate_input=['5.11.16.03',serial(index),0,f'5mm thick tinted glass at Door-{a["id"]}',a['door_width'],a['door_height'],None,a['door_width']*a['door_height'],1*a['no_of_item']])
+			
+
+
+		if a['type']=='sliding_glass_door':
+			
+			
+			rseps.input_data(estimate_input=['5.11.04.1',serial(index),0,f'aluminium sliding doors at Door-{a["id"]}',a['door_width'],a['door_height'],None,a['door_width']*a['door_height'],1*a['no_of_item']])
+			
+			rseps.input_data(estimate_input=['5.11.16.03',serial(index),0,f'5mm thick tinted glass at Door-{a["id"]}',a['door_width'],a['door_height'],None,a['door_width']*a['door_height'],1*a['no_of_item']])
+			
+
+		if a['type']=='plastic':
+			
+			
+			rseps.input_data(estimate_input=['5.08.27',serial(index),0,f'uPVC plastic doors at Door-{a["id"]}',a['door_width'],a['door_height'],None,a['door_width']*a['door_height'],1*a['no_of_item']])
+
+
+		if a['type']=='collaspsible':
+			
+			
+			rseps.input_data(estimate_input=['5.18.03',serial(index),0,f'MS collapsible doors at Door-{a["id"]}',a['door_width'],a['door_height'],None,a['door_width']*a['door_height'],1*a['no_of_item']])
+
+
+	if a['cost_level']=='high':
+		if a['type']=='wooden':
+			
+			rseps.input_data(estimate_input=['5.07.01.1.1',serial(index),0,f'door frame Mehgani 3 in x 6 in section at Door-{a["id"]}',(a['door_width']+2*a['door_height']-2*.076),0.076,0.152,(a['door_width']+2*a['door_height']-2*.076)*0.076*0.152,1*a['no_of_item']])
+			
+			rseps.input_data(estimate_input=['5.16.11.3',serial(index),0,f'varnishing door frame 3 in x 6 in section at Door-{a["id"]}',(a['door_width']+2*a['door_height']-2*.076),0.3047,None,(a['door_width']+2*a['door_height']-2*.076)*0.3047,1*a['no_of_item']])
+			
+			rseps.input_data(estimate_input=['5.08.01.5',serial(index),0,f'door shutter Segun at Door-{a["id"]}',(a['door_width']-2*0.076),(a['door_height']-0.076),None,(a['door_width']-2*0.076)*(a['door_height']-0.076),1*a['no_of_item']])
+
+			
+			rseps.input_data(estimate_input=['5.16.11.3',serial(index),0,f'varnishing on door shutter at Door-{a["id"]}',(a['door_width']-2*0.076),(a['door_height']-0.076),None,(a['door_width']-2*0.076)*(a['door_height']-0.076),2.1*a['no_of_item']])
+
+
+
+
+		if a['type']=='wooden_with_mortrice_lock':
+			
+			rseps.input_data(estimate_input=['5.07.01.1.1',serial(index),0,f'door frame Mehgani 3 in x 6 in section at Door-{a["id"]}',(a['door_width']+2*a['door_height']-2*.076),0.076,0.152,(a['door_width']+2*a['door_height']-2*.076)*0.076*0.152,1*a['no_of_item']])
+			
+			rseps.input_data(estimate_input=['5.16.11.3',serial(index),0,f'varnishing door frame 3 in x 6 in section at Door-{a["id"]}',(a['door_width']+2*a['door_height']-2*.076),0.3047,None,(a['door_width']+2*a['door_height']-2*.076)*0.3047,1*a['no_of_item']])
+			
+			rseps.input_data(estimate_input=['5.08.01.5',serial(index),0,f'door shutter Segun at Door-{a["id"]}',(a['door_width']-2*0.076),(a['door_height']-0.076),None,(a['door_width']-2*0.076)*(a['door_height']-0.076),1*a['no_of_item']])
+
+			
+			rseps.input_data(estimate_input=['5.16.11.3',serial(index),0,f'varnishing on door shutter at Door-{a["id"]}',(a['door_width']-2*0.076),(a['door_height']-0.076),None,(a['door_width']-2*0.076)*(a['door_height']-0.076),2.1*a['no_of_item']])
+
+			
+			rseps.input_data(estimate_input=['5.08.21.1',serial(index),0,f'mortrice lock on door at Door-{a["id"]}',None,None,None,1,1*a['no_of_item']])
+			rseps.input_data(estimate_input=['5.08.24.1',serial(index),0,f'magnetic door holder at Door-{a["id"]}',None,None,None,1,1*a['no_of_item']])
+			rseps.input_data(estimate_input=['5.08.25',serial(index),0,f'25mm eye viewer at Door-{a["id"]}',None,None,None,1,1*a['no_of_item']])
+
+
+		if a['type']=='glass_door':
+			
+			
+			rseps.input_data(estimate_input=['5.20.20.2',serial(index),0,f'tempered glass door at Door-{a["id"]}',a['door_width'],a['door_height'],None,a['door_width']*a['door_height'],1*a['no_of_item']])
+			
+			rseps.input_data(estimate_input=['5.11.16.09',serial(index),0,f'5mm thick tinted glass at Door-{a["id"]}',a['door_width'],a['door_height'],None,a['door_width']*a['door_height'],1*a['no_of_item']])
+			
+
+		if a['type']=='sliding_glass_door':
+			
+			
+			rseps.input_data(estimate_input=['5.11.04.2',serial(index),0,f'aluminium sliding doors at Door-{a["id"]}',a['door_width'],a['door_height'],None,a['door_width']*a['door_height'],1*a['no_of_item']])
+			
+			rseps.input_data(estimate_input=['5.11.16.09',serial(index),0,f'5mm thick tinted glass at Door-{a["id"]}',a['door_width'],a['door_height'],None,a['door_width']*a['door_height'],1*a['no_of_item']])
+			
+
+		if a['type']=='plastic':
+			
+			
+			rseps.input_data(estimate_input=['5.08.28',serial(index),0,f'uPVC plastic doors at Door-{a["id"]}',a['door_width'],a['door_height'],None,a['door_width']*a['door_height'],1*a['no_of_item']])
+
+
+		if a['type']=='collaspsible':
+			
+			
+			rseps.input_data(estimate_input=['5.18.01.2',serial(index),0,f'SS collapsible doors at Door-{a["id"]}',a['door_width'],a['door_height'],None,a['door_width']*a['door_height'],1*a['no_of_item']])
+
+def wood_log(index,a):
+	if a['cost_level']=='low':
+		wooden_code='5.07.10.1'
+	else:
+		wooden_code='5.07.10.3'
+	if a['material_type']=='wood':
+		rseps.input_data(estimate_input=['5.07.10.1',serial(index),0,f'wood log at {a["id"]}',a['length'],a['log_side1'],a['log_side2'],a['length']*a['log_side1']*a['log_side2'],1*a['no_of_item']])
+	if a['material_type']=='ms_angle':
+		if a['ms_angle']=='1.5 x 1.5 x 3/16':
+			unit_wt=2.944
+		if a['ms_angle']=='1.5 x 1.5 x 1/4':
+			unit_wt=3.485
+		if a['ms_angle']=='2 x 2 x 1/4':
+			unit_wt=4.427
+		if a['ms_angle']=='2.5 x 2.5 x 1/4':
+			unit_wt=5.84
+		if a['ms_angle']=='3 x 3 x 1/4':
+			unit_wt=6.782
+		if a['ms_angle']=='3 x 3 x 5/16':
+			unit_wt=8.918
+		
+		rseps.input_data(estimate_input=['5.09.01.06',serial(index),0,f'MS Angle at {a["id"]}',a['length'],unit_wt,1,a['length']*unit_wt,1*a['no_of_item']])
+	
+
+	
+def rod_fn(index,a):
+	unit_wt_rod=a['rod_dia']**2/162.2
+	no_of_rein=int(a['up_to_length']/a['rod_spacing'])
+	a['length']=a['length']+a['no_of_cranks']*a['extra_length_for_crank']
+	if a['cost_level']=='low':
+		
+		rseps.input_data(estimate_input=['5.06.01.01',serial(index),0,f'reinforcement at {a["id"]}',a['length'],unit_wt_rod,no_of_rein,no_of_rein*a['length']*unit_wt_rod,1*a['no_of_item']])
+
+	if a['cost_level']=='high':
+		
+		rseps.input_data(estimate_input=['5.06.01.02',serial(index),0,f'reinforcement at {a["id"]}',a['length'],unit_wt_rod,no_of_rein,no_of_rein*a['length']*unit_wt_rod,1*a['no_of_item']])
+
+def window_fn(index,a):
+	if a['cost_level']=='low':
+		if a['type']=='wooden':
+			
+			rseps.input_data(estimate_input=['5.07.01.1.2',serial(index),0,f'chowkath 2x2 inc window no {a["id"]}',a['window_width'],0.05,0.05,a['window_width']*0.05*0.05,2*a['no_of_item']])
+			
+			rseps.input_data(estimate_input=['5.07.01.1.2',serial(index),0,f'chowkath 2x2 inc window no {a["id"]}',(a['window_height']-2*.05),0.05,0.05,(a['window_height']-2*.05)*0.05*0.05,2*a['no_of_item']])
+			
+			
+			rseps.input_data(estimate_input=['5.08.13.03',serial(index),0,f'shutter at window no {a["id"]}',a['window_width'],a['window_height'],None,a['window_width']*a['window_height'],1*a['no_of_item']])
+			
+			
+			rseps.input_data(estimate_input=['5.16.11.1',serial(index),0,f'varnish at window no {a["id"]}',a['window_width'],a['window_height'],None,a['window_width']*a['window_height'],2.5*a['no_of_item']])
+			if a['grill']=='true':
+				
+				rseps.input_data(estimate_input=['5.10.02',serial(index),0,f'grill at window no {a["id"]}',a['window_width'],a['window_height'],None,a['window_width']*a['window_height'],1*a['no_of_item']])
+			if a['fly_mesh']=='true':
+				
+				rseps.input_data(estimate_input=['5.08.18.1',serial(index),0,f'fly mesh at window no {a["id"]}',a['window_width'],a['window_height'],None,a['window_width']*a['window_height'],1*a['no_of_item']])
+		if a['type']=='thai_window':
+			
+			rseps.input_data(estimate_input=['5.11.07.2.1',serial(index),0,f'sliding window no {a["id"]}',a['window_width'],a['window_height'],None,a['window_width']*a['window_height'],1*a['no_of_item']])
+			
+			rseps.input_data(estimate_input=['5.11.16.03',serial(index),0,f'sliding window no {a["id"]}',a['window_width'],a['window_height'],None,a['window_width']*a['window_height'],1*a['no_of_item']])
+			
+
+			if a['grill']=='true':
+				
+				rseps.input_data(estimate_input=['5.10.02',serial(index),0,f'grill at window no {a["id"]}',a['window_width'],a['window_height'],None,a['window_width']*a['window_height'],1*a['no_of_item']])
+			if a['fly_mesh']=='true':
+				
+				rseps.input_data(estimate_input=['5.08.18.1',serial(index),0,f'fly mesh at window no {a["id"]}',a['window_width'],a['window_height'],None,a['window_width']*a['window_height'],1*a['no_of_item']])
+				
+		
+	if a['cost_level']=='high':
+		if a['type']=='wooden':
+			
+			rseps.input_data(estimate_input=['5.07.01.1.1',serial(index),0,f'chowkath 4x4 inc window no {a["id"]}',a['window_width'],0.1,0.1,a['window_width']*0.1*0.1,2*a['no_of_item']])
+			
+			rseps.input_data(estimate_input=['5.07.01.1.1',serial(index),0,f'chowkath 4x4 inc window no {a["id"]}',(a['window_height']-2*.1),0.1,0.1,(a['window_height']-2*.1)*0.1*0.1,2*a['no_of_item']])
+			
+			
+			rseps.input_data(estimate_input=['5.08.13.05',serial(index),0,f'shutter at window no {a["id"]}',a['window_width'],a['window_height'],None,a['window_width']*a['window_height'],1*a['no_of_item']])
+			
+			
+			rseps.input_data(estimate_input=['5.16.11.1',serial(index),0,f'varnish at window no {a["id"]}',a['window_width'],a['window_height'],None,a['window_width']*a['window_height'],2.5*a['no_of_item']])
+			if a['grill']=='true':
+				
+				rseps.input_data(estimate_input=['5.10.04.2',serial(index),0,f'grill at window no {a["id"]}',a['window_width'],a['window_height'],None,a['window_width']*a['window_height'],1*a['no_of_item']])
+			if a['fly_mesh']=='true':
+				
+				rseps.input_data(estimate_input=['5.08.18.6',serial(index),0,f'fly mesh at window no {a["id"]}',a['window_width'],a['window_height'],None,a['window_width']*a['window_height'],1*a['no_of_item']])
+		if a['type']=='thai_window':
+			
+			rseps.input_data(estimate_input=['5.11.07.2.2',serial(index),0,f'sliding window no {a["id"]}',a['window_width'],a['window_height'],None,a['window_width']*a['window_height'],1*a['no_of_item']])
+			
+			rseps.input_data(estimate_input=['5.11.16.07',serial(index),0,f'sliding window no {a["id"]}',a['window_width'],a['window_height'],None,a['window_width']*a['window_height'],1*a['no_of_item']])
+			
+			if a['grill']=='true':
+				
+				rseps.input_data(estimate_input=['5.10.04.2',serial(index),0,f'grill at window no {a["id"]}',a['window_width'],a['window_height'],None,a['window_width']*a['window_height'],1*a['no_of_item']])
+			if a['fly_mesh']=='true':
+				
+				rseps.input_data(estimate_input=['5.08.18.6',serial(index),0,f'fly mesh at window no {a["id"]}',a['window_width'],a['window_height'],None,a['window_width']*a['window_height'],1*a['no_of_item']])
+				
+def commode_and_sanitary_fn(index,a):
+	if a['cost_level']=='low':
+		if a['type']=='english_type':
+			
+			rseps.input_data(estimate_input=['7.01.4',serial(index),0,f'english commode no {a["id"]}',None,None,None,1,1*a['no_of_item']])
+		if a['type']=='bangla_type':
+			
+			rseps.input_data(estimate_input=['7.07.5',serial(index),0,f'bangla commode no {a["id"]}',None,None,None,1,1*a['no_of_item']])
+		
+		
+		if a['type']=='flat_type':
+			
+			rseps.input_data(estimate_input=['7.06',serial(index),0,f'squatting urinal no {a["id"]}',None,None,None,1,1*a['no_of_item']])
+		if a['type']=='urinal':
+			
+			rseps.input_data(estimate_input=['7.05.3',serial(index),0,f'bowl urinal no {a["id"]}',None,None,None,1,1*a['no_of_item']])
+		
+		
+
+	if a['cost_level']=='high':
+		if a['type']=='english_type':
+			
+			rseps.input_data(estimate_input=['7.01.7',serial(index),0,f'english commode no {a["id"]}',None,None,None,1,1*a['no_of_item']])
+		if a['type']=='bangla_type':
+			
+			rseps.input_data(estimate_input=['7.07.5',serial(index),0,f'bangla commode no {a["id"]}',None,None,None,1,1*a['no_of_item']])
+		
+		
+		if a['type']=='flat_type':
+			
+			rseps.input_data(estimate_input=['7.06',serial(index),0,f'squatting urinal no {a["id"]}',None,None,None,1,1*a['no_of_item']])
+		if a['type']=='urinal':
+			
+			rseps.input_data(estimate_input=['7.05.4',serial(index),0,f'bowl urinal no {a["id"]}',None,None,None,1,1*a['no_of_item']])
+
+def inspection_pit_fn(index,a):
+	if a['cost_level']=='low':
+		
+		rseps.input_data(estimate_input=['7.70.1',serial(index),0,f'masonary inspection pit no {a["id"]}',None,None,None,1,1*a['no_of_item']])
+	if a['cost_level']=='high':
+		
+		rseps.input_data(estimate_input=['7.70.2',serial(index),0,f'masonary inspection pit no {a["id"]}',None,None,None,1,1*a['no_of_item']])
+
+def septic_tank_fn(index,a):
+	if a['cost_level']=='low':
+		
+		rseps.input_data(estimate_input=['7.74.5',serial(index),0,f'septic tank no {a["id"]}',None,None,None,1,1*a['no_of_item']])
+	if a['cost_level']=='high':
+		
+		rseps.input_data(estimate_input=['7.74.4',serial(index),0,f'septic tank no {a["id"]}',None,None,None,1,1*a['no_of_item']])
+
+def soak_well_fn(index,a):
+	if a['cost_level']=='low':
+		
+		rseps.input_data(estimate_input=['7.76.3',serial(index),0,f'soak_well no {a["id"]}',None,None,None,1,1*a['no_of_item']])
+	if a['cost_level']=='high':
+		
+		rseps.input_data(estimate_input=['7.76.2',serial(index),0,f'soak_well no {a["id"]}',None,None,None,1,1*a['no_of_item']])
+
+def brick_work_wall_fn(index,a,joint2,joint3,joint4,one_time_for_wall_deduction):
+	w=a['wall_thickness']
+	wall_thickness_arr=[a['wall_thickness1'],a['wall_thickness2'],a['wall_thickness3'],a['wall_thickness4'],a['wall_thickness5'],a['wall_thickness6'],a['wall_thickness7'],a['wall_thickness8'],a['wall_thickness9'],a['wall_thickness_final']]
+	h=a['wall_height']
+	wall_height_arr=[a['wall_height1'],a['wall_height2'],a['wall_height3'],a['wall_height4'],a['wall_height5'],a['wall_height6'],a['wall_height7'],a['wall_height8'],a['wall_height9'],a['wall_height_final']]
+	th_rev11=[i for i in wall_thickness_arr if i!=0]
+	th_rev11.reverse()
+	if len(th_rev11)!=0:
+		a['last_footing_width']=th_rev11[0]
+	else:
+		a['last_footing_width']=0
+
+	if a['cost_level']=='low':
+		sqm_code='5.04.16'
+		cum_code='5.04.01'
+		earth_cut_code='5.02.01.2'
+		earth_filling_code='5.02.01.2'
+		soling_code='5.03.01'
+		CC_code='5.03.03.1'
+	if a['cost_level']=='high':
+		sqm_code='5.04.16'  
+		cum_code='5.04.08'
+		earth_cut_code='5.02.01.2'
+		earth_filling_code='5.02.01.2'
+		#5.02.12
+		soling_code='5.03.01'
+		CC_code='5.03.03.2'
+
+
+	if a['wall_thickness']<0.25:
+		
+		rseps.input_data(estimate_input=[sqm_code,serial(index),0,f'brick work no {a["id"]}',a['length'],a['wall_height'],None,a['length']*a['wall_height'],1*a['no_of_item']])
+
+		if a['earth_cutting_depth']!=0:
+			rseps.input_data(estimate_input=[earth_cut_code,serial(index),0,f'brick work no {a["id"]}',a['length'],a['last_footing_width']+0.304,a['earth_cutting_depth'],a['length']*(a['last_footing_width']+0.304)*a['earth_cutting_depth'],1*a['no_of_item']])
+		##########################################
+		height_rev=[i for i in wall_height_arr if i!=0]
+		height_rev.reverse()
+		th_rev=[i for i in wall_thickness_arr if i!=0]
+		th_rev.reverse()
+		print(th_rev)
+		print(height_rev)
+		tt1=0
+		if a['foundation_soling']=='true':
+			tt1=0.075
+
+		yy=a['earth_cutting_depth']-(tt1+a['foundation_cc_thickness'])
+		cum_ht=0
+		area2=0
+		fraction_area=0
+		c_ht=0
+		for i in range(len(th_rev)):
+			
+			cum_ht+=height_rev[i]
+			if cum_ht<=yy:
+				
+				area2=area2+th_rev[i]*height_rev[i]
+				c_ht+=height_rev[i]
+				
+
+			else:
+				print(f'cum_ht : {cum_ht}')
+				#cum_ht+=height_rev[i]
+				
+				remaining_fraction_thickness1=cum_ht-yy
+
+				remaining_fraction_thickness=height_rev[i]-remaining_fraction_thickness1
+				
+				fraction_area=remaining_fraction_thickness*th_rev[i]
+				
+				break
+		area3=area2+fraction_area
+		
+		
+
+		area4=area3+a['last_footing_width']*(tt1+a['foundation_cc_thickness'])
+		print(f'remain : {area4}')
+		area5=(a['last_footing_width']+0.304)*a['earth_cutting_depth']
+		filling_final_area=area5-area4
+		print(f'final area : {filling_final_area}')
+
+
+
+		#########################################  
+		if filling_final_area!=0:
+			
+			rseps.input_data(estimate_input=[earth_filling_code,serial(index),0,f'filling under {a["id"]}filling area:{filling_final_area}',a['length'],filling_final_area,1,a['length'],filling_final_area,1*a['no_of_item']])
+
+		if a['foundation_cc_thickness']!=0:
+			
+			rseps.input_data(estimate_input=[CC_code,serial(index),0,f'CC at Foundation under wall no {a["id"]}',a['length'],a['last_footing_width'],a['foundation_cc_thickness'],a['length']*a['last_footing_width']*a['foundation_cc_thickness'],1*a['no_of_item']])
+
+		if a['foundation_soling']=='true':
+			
+			rseps.input_data(estimate_input=[soling_code,serial(index),0,f'Soling at Foundation under wall no {a["id"]}',a['length'],a['last_footing_width'],None,a['length']*a['last_footing_width'],1*a['no_of_item']])
+
+
+
+
+		if a['door_window_area']>0:
+			
+			rseps.input_data(estimate_input=[sqm_code,serial(index),1,f'door and windows at wall {a["id"]}',a['door_window_area'],1,None,a['door_window_area'],1*a['no_of_item']])
+		for i in range(len(wall_thickness_arr)):
+			if wall_thickness_arr[i]!=0:
+				
+				rseps.input_data(estimate_input=[cum_code,serial(index),0,f'at thickness {wall_thickness_arr[i]} at wall {a["id"]}',a['length'],wall_thickness_arr[i],wall_height_arr[i],a['length']*wall_thickness_arr[i]*wall_height_arr[i],1*a['no_of_item']])
+		
+		if one_time_for_wall_deduction==0:
+			print('processed')
+			wall_thickness_arr2=[w]
+			wall_height_arr2=[h]
+
+			for i in range(len(wall_thickness_arr)):
+				wall_thickness_arr2.append(wall_thickness_arr[i])
+				wall_height_arr2.append(wall_height_arr[i])
+				
+
+			for j in range(joint2):
+				for i in range(len(wall_thickness_arr2)):
+					if i==0:
+						
+						rseps.input_data(estimate_input=[sqm_code,serial(index),1,f'deduction for joint J2 joint width {wall_thickness_arr2[i]}',w,h,None,w*h,1])
+				
+
+					if wall_thickness_arr2[i]!=0 and i!=0:
+						
+						rseps.input_data(estimate_input=[cum_code,serial(index),1,f'deduction for joint J2 joint width {wall_thickness_arr2[i]}',w,wall_thickness_arr2[i],wall_height_arr2[i],w*wall_thickness_arr2[i]*wall_height_arr2[i],1])
+				
+				if a['earth_cutting_depth']!=0:
+					
+					rseps.input_data(estimate_input=[earth_cut_code,serial(index),1,f'deduction for joint J2',w,a['last_footing_width']+0.304,a['earth_cutting_depth'],(w*(a['last_footing_width']+0.304)*a['earth_cutting_depth']),1])
+				
+				if a['foundation_cc_thickness']!=0:
+					
+					rseps.input_data(estimate_input=[CC_code,serial(index),1,f'deduction for joint J2',w,a['last_footing_width'],a['foundation_cc_thickness'],(w*a['last_footing_width']*a['foundation_cc_thickness']),1])
+				
+				if a['foundation_soling']=='true':
+					
+					rseps.input_data(estimate_input=[soling_code,serial(index),1,f'deduction for joint J2',w,a['last_footing_width'],None,(w*a['last_footing_width']),1])
+			
+
+
+			for j in range(joint3):
+				for i in range(len(wall_thickness_arr2)):
+					if i==0:
+						
+						rseps.input_data(estimate_input=[sqm_code,serial(index),1,f'deduction for joint J3 joint width {wall_thickness_arr2[i]}',w,h,None,w*h,1])
+				
+					if wall_thickness_arr2[i]!=0 and i!=0:
+						
+						rseps.input_data(estimate_input=[cum_code,serial(index),1,f'deduction for joint J3 joint width {wall_thickness_arr2[i]}',wall_thickness_arr2[i],(wall_thickness_arr2[i]/2+w/2),wall_height_arr2[i],wall_thickness_arr2[i]*(wall_thickness_arr2[i]/2+w/2)*wall_height_arr2[i],1])
+				if a['earth_cutting_depth']!=0:
+					
+					rseps.input_data(estimate_input=[earth_cut_code,serial(index),1,f'deduction for joint J3',(a['last_footing_width']+0.304),((a['last_footing_width']+0.304)/2+w/2),a['earth_cutting_depth'],(a['last_footing_width']+0.304)*((a['last_footing_width']+0.304)/2+w/2)*a['earth_cutting_depth'],1])
+				
+				if a['foundation_cc_thickness']!=0:
+					
+					rseps.input_data(estimate_input=[CC_code,serial(index),1,f'deduction for joint J3',a['last_footing_width'],(a['last_footing_width']/2+w/2),a['foundation_cc_thickness'],a['last_footing_width']*(a['last_footing_width']/2+w/2)*a['foundation_cc_thickness'],1])
+			
+				if a['foundation_soling']=='true':
+					
+					rseps.input_data(estimate_input=[soling_code,serial(index),1,f'deduction for joint J3',(a['last_footing_width']),((a['last_footing_width'])/2+w/2),None,(a['last_footing_width'])*((a['last_footing_width'])/2+w/2),1])
+			
+
+
+			for j in range(joint4):
+				for i in range(len(wall_thickness_arr2)):
+					if i==0:
+						
+						rseps.input_data(estimate_input=[sqm_code,serial(index),1,f'deduction for joint J4 joint width {wall_thickness_arr2[i]}',w,h,None,w*h,1])
+				
+					if wall_thickness_arr2[i]!=0 and i!=0:
+						
+						rseps.input_data(estimate_input=[cum_code,serial(index),1,f'deduction for joint J4 joint width {wall_thickness_arr2[i]}',wall_thickness_arr2[i],wall_thickness_arr2[i],wall_height_arr2[i],(wall_thickness_arr2[i]**2)*wall_height_arr2[i],1])
+				
+				if a['earth_cutting_depth']!=0:
+					
+					rseps.input_data(estimate_input=[earth_cut_code,serial(index),1,f'deduction for joint J4',(a['last_footing_width']+0.304),(a['last_footing_width']+0.304),a['earth_cutting_depth'],((a['last_footing_width']+0.304)*(a['last_footing_width']+0.304)*a['earth_cutting_depth']),1])
+				
+				if a['foundation_cc_thickness']!=0:
+					
+					rseps.input_data(estimate_input=[CC_code,serial(index),1,f'deduction for joint J4',(a['last_footing_width']),(a['last_footing_width']),a['foundation_cc_thickness'],((a['last_footing_width'])*(a['last_footing_width'])*a['foundation_cc_thickness']),1])
+			
+				if a['foundation_soling']=='true':
+					
+					rseps.input_data(estimate_input=[soling_code,serial(index),1,f'deduction for joint J4',(a['last_footing_width']),(a['last_footing_width']),None,a['last_footing_width']*a['last_footing_width'],1])
+			
+
+
+
+	else:
+		
+		rseps.input_data(estimate_input=[cum_code,serial(index),0,f'wall no {a["id"]}',a['length'],a['wall_thickness'],a['wall_height'],a['length']*a['wall_height']*a['wall_thickness'],1*a['no_of_item']])
+		
+
+		if a['earth_cutting_depth']!=0:
+			
+			rseps.input_data(estimate_input=[earth_cut_code,serial(index),0,f'earth cutting under {a["id"]}',a['length'],a['last_footing_width']+0.304,a['earth_cutting_depth'],a['length']*(a['last_footing_width']+0.304)*a['earth_cutting_depth'],1*a['no_of_item']])
+
+		##########################################
+		height_rev=[i for i in wall_height_arr if i!=0]
+		height_rev.reverse()
+		th_rev=[i for i in wall_thickness_arr if i!=0]
+		th_rev.reverse()
+		print(th_rev)
+		print(height_rev)
+		tt1=0
+		if a['foundation_soling']=='true':
+			tt1=0.075
+
+		yy=a['earth_cutting_depth']-(tt1+a['foundation_cc_thickness'])
+		cum_ht=0
+		area2=0
+		fraction_area=0
+		c_ht=0
+		for i in range(len(th_rev)):
+			
+			cum_ht+=height_rev[i]
+			if cum_ht<=yy:
+				
+				area2=area2+th_rev[i]*height_rev[i]
+				c_ht+=height_rev[i]
+				
+
+			else:
+				print(f'cum_ht : {cum_ht}')
+				#cum_ht+=height_rev[i]
+				
+				remaining_fraction_thickness1=cum_ht-yy
+
+				remaining_fraction_thickness=height_rev[i]-remaining_fraction_thickness1
+				
+				fraction_area=remaining_fraction_thickness*th_rev[i]
+				
+				break
+		area3=area2+fraction_area
+		
+		
+
+		area4=area3+a['last_footing_width']*(tt1+a['foundation_cc_thickness'])
+		print(f'remain : {area4}')
+		area5=(a['last_footing_width']+0.304)*a['earth_cutting_depth']
+		filling_final_area=area5-area4
+
+
+		print(f'final area : {filling_final_area}')
+		#########################################  
+		if filling_final_area!=0:
+			
+			rseps.input_data(estimate_input=[earth_filling_code,serial(index),0,f'filling under {a["id"]}filling area:{filling_final_area}',a['length'],filling_final_area,1,a['length']*filling_final_area,1*a['no_of_item']])
+		
+		if a['foundation_cc_thickness']!=0:
+			
+			rseps.input_data(estimate_input=[CC_code,serial(index),0,f'CC at Foundation under wall no {a["id"]}',a['length'],a['last_footing_width'],a['foundation_cc_thickness'],a['length']*a['last_footing_width']*a['foundation_cc_thickness'],1*a['no_of_item']])
+
+		if a['foundation_soling']=='true':
+			
+			rseps.input_data(estimate_input=[soling_code,serial(index),0,f'Soling at Foundation under wall no {a["id"]}',a['length'],a['last_footing_width'],None,a['length']*a['last_footing_width'],1*a['no_of_item']])
+
+
+
+
+		if a['door_window_area']>0:
+			
+			rseps.input_data(estimate_input=[cum_code,serial(index),1,f'door and windows at wall {a["id"]}',a['door_window_area'],a['door_window_thickness'],1,a['door_window_area']*a['door_window_thickness'],1*a['no_of_item']])
+		for i in range(len(wall_thickness_arr)):
+			if wall_thickness_arr[i]!=0:
+				
+				rseps.input_data(estimate_input=[cum_code,serial(index),0,f'at thickness {wall_thickness_arr[i]} at wall {a["id"]}',a['length'],wall_thickness_arr[i],wall_height_arr[i],a['length']*wall_thickness_arr[i]*wall_height_arr[i],1*a['no_of_item']])
+		
+		if one_time_for_wall_deduction==0:
+			print('processed')
+			wall_thickness_arr2=[w]
+			wall_height_arr2=[h]
+			for i in range(len(wall_thickness_arr)):
+				wall_thickness_arr2.append(wall_thickness_arr[i])
+				wall_height_arr2.append(wall_height_arr[i])
+
+
+			for j in range(joint2):
+				for i in range(len(wall_thickness_arr2)):
+					if wall_thickness_arr2[i]!=0:
+						
+						rseps.input_data(estimate_input=[cum_code,serial(index),1,f'deduction for joint J2 joint width {wall_thickness_arr2[i]}',w,wall_thickness_arr2[i],wall_height_arr2[i],w*wall_thickness_arr2[i]*wall_height_arr2[i],1])
+				
+				if a['earth_cutting_depth']!=0:
+					
+					rseps.input_data(estimate_input=[earth_cut_code,serial(index),1,f'deduction for joint J2',w,a['last_footing_width']+0.304,a['earth_cutting_depth'],(w*(a['last_footing_width']+0.304)*a['earth_cutting_depth']),1])
+				
+				if a['foundation_cc_thickness']!=0:
+					
+					rseps.input_data(estimate_input=[CC_code,serial(index),1,f'deduction for joint J2',w,a['last_footing_width'],a['foundation_cc_thickness'],(w*a['last_footing_width']*a['foundation_cc_thickness']),1])
+				
+				if a['foundation_soling']=='true':
+					
+					rseps.input_data(estimate_input=[soling_code,serial(index),1,f'deduction for joint J2',w,a['last_footing_width'],None,(w*a['last_footing_width']),1])
+			
+
+
+			for j in range(joint3):
+				for i in range(len(wall_thickness_arr2)):
+					if wall_thickness_arr2[i]!=0:
+						
+						rseps.input_data(estimate_input=[cum_code,serial(index),1,f'deduction for joint J3 joint width {wall_thickness_arr2[i]}',wall_thickness_arr2[i],(wall_thickness_arr2[i]/2+w/2),wall_height_arr2[i],wall_thickness_arr2[i]*(wall_thickness_arr2[i]/2+w/2)*wall_height_arr2[i],1])
+				if a['earth_cutting_depth']!=0:
+					
+					rseps.input_data(estimate_input=[earth_cut_code,serial(index),1,f'deduction for joint J3',(a['last_footing_width']+0.304),((a['last_footing_width']+0.304)/2+w/2),a['earth_cutting_depth'],(a['last_footing_width']+0.304)*((a['last_footing_width']+0.304)/2+w/2)*a['earth_cutting_depth'],1])
+				
+				if a['foundation_cc_thickness']!=0:
+					
+					rseps.input_data(estimate_input=[CC_code,serial(index),1,f'deduction for joint J3',a['last_footing_width'],(a['last_footing_width']/2+w/2),a['foundation_cc_thickness'],a['last_footing_width']*(a['last_footing_width']/2+w/2)*a['foundation_cc_thickness'],1])
+			
+				if a['foundation_soling']=='true':
+					
+					rseps.input_data(estimate_input=[soling_code,serial(index),1,f'deduction for joint J3',(a['last_footing_width']),((a['last_footing_width'])/2+w/2),None,(a['last_footing_width'])*((a['last_footing_width'])/2+w/2),1])
+			
+
+
+			for j in range(joint4):
+				for i in range(len(wall_thickness_arr2)):
+					if wall_thickness_arr2[i]!=0:
+						
+						rseps.input_data(estimate_input=[cum_code,serial(index),1,f'deduction for joint J4 joint width {wall_thickness_arr2[i]}',wall_thickness_arr2[i],wall_thickness_arr2[i],wall_height_arr2[i],(wall_thickness_arr2[i]**2)*wall_height_arr2[i],1])
+				
+				if a['earth_cutting_depth']!=0:
+					
+					rseps.input_data(estimate_input=[earth_cut_code,serial(index),1,f'deduction for joint J4',(a['last_footing_width']+0.304),(a['last_footing_width']+0.304),a['earth_cutting_depth'],((a['last_footing_width']+0.304)*(a['last_footing_width']+0.304)*a['earth_cutting_depth']),1])
+				
+				if a['foundation_cc_thickness']!=0:
+					
+					rseps.input_data(estimate_input=[CC_code,serial(index),1,f'deduction for joint J4',(a['last_footing_width']),(a['last_footing_width']),a['foundation_cc_thickness'],((a['last_footing_width'])*(a['last_footing_width'])*a['foundation_cc_thickness']),1])
+			
+				if a['foundation_soling']=='true':
+					
+					rseps.input_data(estimate_input=[soling_code,serial(index),1,f'deduction for joint J4',(a['last_footing_width']),(a['last_footing_width']),None,a['last_footing_width']*a['last_footing_width'],1])
+			
+
+def Wal_finishings_fn(index,a):
+	if a['cost_level']=='low':
+		plaster_code='5.12.01'
+		painting_code='5.16.03.1'
+		pointing_code='5.12.08'
+		weather_coat_code='5.16.02'
+		wall_tiles_code='5.15.06.4'
+
+		ver_grill_code='5.10.06'
+		ss_grill_code='5.20.11.2'
+		ci_sheet_code='5.09.01.21'
+	if a['cost_level']=='high':
+		plaster_code='5.12.04'
+		painting_code='5.16.08.1'
+		pointing_code='5.12.09'
+		weather_coat_code='5.16.09.2'
+		wall_tiles_code='5.15.06.6'
+
+		ver_grill_code='5.10.09'
+		ss_grill_code='5.20.11.1'
+		ci_sheet_code='5.09.01.21'
+
+	tot_height=a['height']+a['offset1']+a['offset2']+a['offset3']
+	if a['ver_grill']=='true':
+		
+		rseps.input_data(estimate_input=[ver_grill_code,serial(index),0,f'MS Grill at surface no {a["id"]}',a['length'],tot_height,None,a['length']*tot_height,1*a['no_of_item']])
+
+		
+	if a['ss_grill']=='true':
+		
+		rseps.input_data(estimate_input=[ss_grill_code,serial(index),0,f'SS Grill at surface no {a["id"]}',a['length'],tot_height,None,a['length']*tot_height,1*a['no_of_item']])
+	if a['ci_sheet']=='true':
+		
+		rseps.input_data(estimate_input=[ci_sheet_code,serial(index),0,f'CI Sheet at {a["id"]}',a['length'],a['height'],None,a['length']*a['height'],1*a['no_of_item']])
+		if a['doors_windows_total_area']!=0:
+			
+			rseps.input_data(estimate_input=[ci_sheet_code,serial(index),1,f'door & windows at {a["id"]}',a['doors_windows_total_area'],1,None,a['doors_windows_total_area'],1*a['no_of_item']])
+		
+	if a['plaster']=='true':
+		
+		rseps.input_data(estimate_input=[plaster_code,serial(index),0,f'plaster at surface no {a["id"]}',a['length'],tot_height,None,a['length']*tot_height,1*a['no_of_item']])
+		
+		if a['doors_windows_total_area']!=0:
+			
+			rseps.input_data(estimate_input=[plaster_code,serial(index),1,f'door & windows area 80% for seal at {a["id"]}',a['doors_windows_total_area'],1,None,a['doors_windows_total_area'],0.8*a['no_of_item']])
+			
+	if a['paint']=='true':
+		
+		rseps.input_data(estimate_input=[painting_code,serial(index),0,f'painting at surface no {a["id"]}',a['length'],tot_height,None,a['length']*tot_height,1])
+		if a['doors_windows_total_area']!=0:
+			
+			rseps.input_data(estimate_input=[painting_code,serial(index),1,f'door & windows area 80% for seal at {a["id"]}',a['doors_windows_total_area'],1,None,a['doors_windows_total_area'],0.8*a['no_of_item']])
+			
+	if a['pointing']=='true':
+		
+		rseps.input_data(estimate_input=[pointing_code,serial(index),0,f'pointing at surface no {a["id"]}',a['length'],tot_height,None,a['length']*tot_height,1*a['no_of_item']])
+		if a['doors_windows_total_area']!=0:
+			
+			rseps.input_data(estimate_input=[pointing_code,serial(index),1,f'door & windows area 80% for seal at {a["id"]}',a['doors_windows_total_area'],1,None,a['doors_windows_total_area'],0.8*a['no_of_item']])
+			
+	if a['weather_coat']=='true':
+		
+		rseps.input_data(estimate_input=[weather_coat_code,serial(index),0,f'weather coating at surface no {a["id"]}',a['length'],tot_height,None,a['length']*tot_height,1*a['no_of_item']])
+		if a['doors_windows_total_area']!=0:
+			
+			rseps.input_data(estimate_input=[weather_coat_code,serial(index),1,f'door & windows area 80% for seal at {a["id"]}',a['doors_windows_total_area'],1,None,a['doors_windows_total_area'],0.8*a['no_of_item']])
+			
+	if a['wall_tiles']=='true':
+		
+		rseps.input_data(estimate_input=[wall_tiles_code,serial(index),0,f'wall tiles at surface no {a["id"]}',a['length'],tot_height,None,a['length']*tot_height,1*a['no_of_item']])
+		if a['doors_windows_total_area']!=0:
+			
+			rseps.input_data(estimate_input=[wall_tiles_code,serial(index),1,f'door & windows area 80% for seal at {a["id"]}',a['doors_windows_total_area'],1,None,a['doors_windows_total_area'],0.8*a['no_of_item']])
+
+def formwork_vertical_fn(index,a):
+	if a['cost_level']=='low':
+		wooden_code='5.05.13.03'
+		steel_code='5.05.11.04'
+
+	if a['cost_level']=='high':
+		wooden_code='5.05.13.06'
+		steel_code='5.05.11.07'
+
+	if a['type']=='wood':
+		
+		rseps.input_data(estimate_input=[wooden_code,serial(index),0,f'shutter no {a["id"]}',a['length'],a['formwork_height'],None,a['length']*a['formwork_height'],1*a['no_of_item']])
+		
+	if a['type']=='steel':
+		
+		rseps.input_data(estimate_input=[steel_code,serial(index),0,f'shutter no {a["id"]}',a['length'],a['formwork_height'],None,a['length']*a['formwork_height'],1*a['no_of_item']])
+		
+def formwork_plan_fn(index,a):
+	if a['cost_level']=='low':
+		wooden_code='5.05.13.03'
+		steel_code='5.05.11.04'
+
+	if a['cost_level']=='high':
+		wooden_code='5.05.13.06'
+		steel_code='5.05.11.07'
+
+	if a['type']=='wood':
+		
+		rseps.input_data(estimate_input=[wooden_code,serial(index),0,f'shutter no {a["id"]}',a['length'],a['width'],None,a['length']*a['width'],1*a['no_of_item']])
+		
+	if a['type']=='steel':
+		
+		rseps.input_data(estimate_input=[steel_code,serial(index),0,f'shutter no {a["id"]}',a['length'],a['width'],None,a['length']*a['width'],1*a['no_of_item']])
+
+def floor_finishings_fn(index,a):
+	if a['cost_level']=='low':
+		soling_code='5.03.01'
+		CC_code='5.03.03.2'
+
+		if a['tiles_type']=='glazed':
+			tiles_code='5.15.02.1'
+		if a['tiles_type']=='unglazed':
+			tiles_code='5.15.16.01'
+		if a['tiles_type']=='merble':
+			tiles_code='5.14.01.5'
+		earth_filling_code='5.02.11'
+		patent_stone_code='5.13.01'
+		painting_code='5.16.03.1'
+		weather_coat_code='5.16.02'
+		varnish_code='5.16.11.3'
+		ci_sheet_code='5.09.01.21'
+
+
+	if a['cost_level']=='high':
+		soling_code='5.03.01'
+		CC_code='5.03.03.1'
+
+		if a['tiles_type']=='glazed':
+			tiles_code='5.15.02.6'
+		if a['tiles_type']=='unglazed':
+			tiles_code='5.15.16.02'
+		if a['tiles_type']=='merble':
+			tiles_code='5.14.01.3'
+		earth_filling_code='5.02.13'
+		patent_stone_code='5.13.06'
+		painting_code='5.16.08.1'
+		weather_coat_code='5.16.09.2'
+		varnish_code='5.16.11.3'
+		ci_sheet_code='5.09.01.21'
+
+	if a['soling']=='true':
+		
+		rseps.input_data(estimate_input=[soling_code,serial(index),0,f'soling at area no {a["id"]}',a['length'],a['width'],None,a['length']*a['width'],1*a['no_of_item']])
+	if a['ci_sheet']=='true':
+		
+		rseps.input_data(estimate_input=[ci_sheet_code,serial(index),0,f'CI Sheet at {a["id"]}',a['length'],a['width'],None,a['length']*a['width'],1*a['no_of_item']])
+	
+
+	if a['cc_thickness']!=0:
+		
+		rseps.input_data(estimate_input=[CC_code,serial(index),0,f'CC at area no {a["id"]}',a['length'],a['width'],a['cc_thickness'],a['length']*a['width']*a['cc_thickness'],1*a['no_of_item']])
+	if a['tiles']=='true':
+		
+		rseps.input_data(estimate_input=[tiles_code,serial(index),0,f'tiles at area no {a["id"]}',a['length'],a['width'],None,a['length']*a['width'],1*a['no_of_item']])
+	if a['earth_filling_depth_under_pl_to_gl']!=0:
+		
+		rseps.input_data(estimate_input=[earth_filling_code,serial(index),0,f'earth filling at area no {a["id"]}',a['length'],a['width'],a['earth_filling_depth_under_pl_to_gl'],a['length']*a['width']*a['earth_filling_depth_under_pl_to_gl'],1*a['no_of_item']])
+	if a['paint']=='true':
+		
+		rseps.input_data(estimate_input=[painting_code,serial(index),0,f'painting at area no {a["id"]}',a['length'],a['width'],None,a['length']*a['width'],1*a['no_of_item']])
+	if a['weather_coat']=='true':
+		
+		rseps.input_data(estimate_input=[weather_coat_code,serial(index),0,f'weather coat at area no {a["id"]}',a['length'],a['width'],None,a['length']*a['width'],1*a['no_of_item']])
+	if a['varnish']=='true':
+		
+		rseps.input_data(estimate_input=[varnish_code,serial(index),0,f'varnish at area no {a["id"]}',a['length'],a['width'],None,a['length']*a['width'],1*a['no_of_item']])
+	if a['patent_stone']=='true':
+		
+		rseps.input_data(estimate_input=[patent_stone_code,serial(index),0,f'patent stone at area no {a["id"]}',a['length'],a['width'],None,a['length']*a['width'],1*a['no_of_item']])
+
+
+def column_with_base_fn(index,a):
+	if a['cost_level']=='low':
+		base_rcc_code='5.05.02.01'
+		column_rcc_code='5.05.01.02'
+		rod_code='5.06.01.02'
+		formwork_code='5.05.13.02'
+		poly_code='5.03.05'
+		earth_cut_code='5.02.01.2'
+		earth_filling_code='5.02.01.2'
+		CC_code='5.03.03.1'
+		soling_code='5.03.01'
+
+	if a['cost_level']=='high':
+		base_rcc_code='5.05.03.04'
+		column_rcc_code='5.05.02.04'
+		rod_code='5.06.01.02'
+		formwork_code='5.05.13.06'
+		poly_code='5.03.05'
+		earth_cut_code='5.02.01.2'
+		earth_filling_code='5.02.01.2'
+		#5.02.12
+		CC_code='5.03.03.2'
+		soling_code='5.03.01'
+	t1=0
+	if a['base_soling']=='true':
+		t1=0.075
+	
+	rseps.input_data(estimate_input=[earth_cut_code,serial(index),0,f'Earth cutting at column base no {a["id"]}',a['base_length']+0.304,a['base_width']+0.304,a['earth_cutting_depth'],(a['base_length']+0.304)*(a['base_width']+0.304)*a['earth_cutting_depth'],1*a['no_of_item']])
+	
+	voln=(a['base_length']+0.304)*(a['base_width']+0.304)*a['earth_cutting_depth']-a['base_length']*a['base_width']*(t1+a['base_cc_thickness']+a['base_thickness'])-a['column_side1']*a['column_side2']*(a['earth_cutting_depth']-a['base_thickness']-t1-a['base_cc_thickness'])
+	area1=voln/a['earth_cutting_depth']
+
+	
+	rseps.input_data(estimate_input=[earth_filling_code,serial(index),0,f'Earth filling at column base no {a["id"]}',None,None,None,voln,1*a['no_of_item']])
+	
+
+	
+	rseps.input_data(estimate_input=[column_rcc_code,serial(index),0,f'RCC at column no {a["id"]}',a['column_side1'],a['column_side2'],a['column_height'],a['column_side1']*a['column_side2']*a['column_height'],1*a['no_of_item']])
+	
+	col_rod_tot_length=a['column_height']+0.61
+	col_no_of_tie=round(a['column_height']/a['tie_spacing'])
+	col_rod_unit=a['column_rod_dia']**2/162.2
+	base_rod_unit=a['base_rod_dia']**2/162.2
+	base_no_of_rod_x=round(a['base_width']/a['base_rod_spacing_x'])
+	base_no_of_rod_y=round(a['base_length']/a['base_rod_spacing_y'])
+	tie_length=2*a['column_side1']+2*a['column_side2']+0.15
+	
+	if a['base_soling']=='true':
+		rseps.input_data(estimate_input=[soling_code,serial(index),0,f'RCC at base no {a["id"]}',a['base_length'],a['base_width'],None,a['base_length']*a['base_width'],1*a['no_of_item']])
+	if a['base_cc_thickness']!=0:
+		rseps.input_data(estimate_input=[CC_code,serial(index),0,f'RCC at base no {a["id"]}',a['base_length'],a['base_width'],a['base_cc_thickness'],a['base_length']*a['base_width']*a['base_cc_thickness'],1*a['no_of_item']])
+	
+	
+	rseps.input_data(estimate_input=[rod_code,serial(index),0,f'at column no {a["id"]}',col_rod_tot_length,col_rod_unit,a['column_no_of_rod'],col_rod_tot_length*col_rod_unit*a['column_no_of_rod'],1*a['no_of_item']])
+	
+	
+	rseps.input_data(estimate_input=[rod_code,serial(index),0,f'ties at column no {a["id"]}',tie_length,0.617,col_no_of_tie,col_no_of_tie*tie_length*0.617,1*a['no_of_item']])
+	
+	
+	rseps.input_data(estimate_input=[formwork_code,serial(index),0,f'shuttering at column no {a["id"]}',a['column_height'],a['column_side1'],None,a['column_height']*a['column_side1'],2*a['no_of_item']])
+	
+	
+	rseps.input_data(estimate_input=[formwork_code,serial(index),0,f'shuttering at column no {a["id"]}',a['column_height'],a['column_side2'],None,a['column_height']*a['column_side2'],2*a['no_of_item']])
+	###############base
+
+	
+	rseps.input_data(estimate_input=[base_rcc_code,serial(index),0,f'RCC at base no {a["id"]}',a['base_length'],a['base_width'],a['base_thickness'],a['base_length']*a['base_width']*a['base_thickness'],1*a['no_of_item']])
+	
+	
+	rseps.input_data(estimate_input=[rod_code,serial(index),0,f'rod x direction at base no {a["id"]}',(a['base_length']-0.15),base_rod_unit,base_no_of_rod_x,base_no_of_rod_x*(a['base_length']-0.15)*base_rod_unit,1*a['no_of_item']])
+	
+	
+	rseps.input_data(estimate_input=[rod_code,serial(index),0,f'rod y direction at base no {a["id"]}',(a['base_width']-0.15),base_rod_unit,base_no_of_rod_y,base_no_of_rod_y*(a['base_width']-0.15)*base_rod_unit,1*a['no_of_item']])
+	
+	
+	rseps.input_data(estimate_input=[formwork_code,serial(index),0,f'shuttering at base no {a["id"]}',a['base_length'],a['base_thickness'],None,a['base_length']*a['base_thickness'],2*a['no_of_item']])
+	
+	rseps.input_data(estimate_input=[formwork_code,serial(index),0,f'shuttering at base no {a["id"]}',a['base_width'],a['base_thickness'],None,a['base_width']*a['base_thickness'],2*a['no_of_item']])
+	#5.03.05
+	
+	rseps.input_data(estimate_input=[poly_code,serial(index),0,f'polythene at base no {a["id"]}',a['base_length'],a['base_thickness'],None,a['base_length']*a['base_thickness'],2*a['no_of_item']])
+	
+	rseps.input_data(estimate_input=[poly_code,serial(index),0,f'polythene at base no {a["id"]}',a['base_width'],a['base_thickness'],None,a['base_width']*a['base_thickness'],2*a['no_of_item']])
+	
+	rseps.input_data(estimate_input=[poly_code,serial(index),0,f'polythene at base no {a["id"]}',a['base_width'],a['base_length'],None,a['base_width']*a['base_length'],1*a['no_of_item']])
+	
+
+def beam_rcc_and_rods_fn(index,a):
+	if a['cost_level']=='low':
+		beam_rcc_code='5.05.02.01'
+		rod_code='5.06.01.02'
+		formwork_code='5.05.13.02'
+		poly_code='5.03.05'
+
+	if a['cost_level']=='high':
+		beam_rcc_code='5.05.03.04'
+		rod_code='5.06.01.02'
+		formwork_code='5.05.13.06'
+		poly_code='5.03.05'
+	extra_rod_str=a['extra_rods']
+	if extra_rod_str!='':
+		extra_rod_list1=extra_rod_str.split(',')
+		extra_rod_arr=[]
+		for data in extra_rod_list1:
+			a1=data.split('-')
+			extra_rod_arr.append(a1)
+		#####
+
+
+	
+	rseps.input_data(estimate_input=[beam_rcc_code,serial(index),0,f'RCC at beam no {a["id"]}',a['length'],a['width'],a['depth_of_beam'],a['length']*a['width']*a['depth_of_beam'],1*a['no_of_item']])
+	
+	beam_rod_tot_length=a['length']+a['no_of_cranks']*a['extra_length_for_crank']
+	no_of_stirrups=round(a['length']/a['stirrup_spacing'])
+	strirrup_length=a['length_of_stirrup']
+	beam_rod_unit=a['rod_dia']**2/162.2
+	stirrup_rod_unit=a['stirrup_dia']**2/162.2
+
+	
+	
+	rseps.input_data(estimate_input=[rod_code,serial(index),0,f'at beam no {a["id"]}',beam_rod_tot_length,beam_rod_unit,a['total_rods'],beam_rod_tot_length*beam_rod_unit*a['total_rods'],1*a['no_of_item']])
+	
+	
+	rseps.input_data(estimate_input=[rod_code,serial(index),0,f'stirrups at beam no {a["id"]}',strirrup_length,stirrup_rod_unit,no_of_stirrups,no_of_stirrups*strirrup_length*stirrup_rod_unit,1*a['no_of_item']])
+	###
+	for data in extra_rod_arr:
+		rseps.input_data(estimate_input=[rod_code,serial(index),0,f'extra at beam no {a["id"]}',float(data[2]),float(data[1])**2/162.2,float(data[0]), float(data[2])*(float(data[1])**2/162.2)*float(data[0]) ,1*a['no_of_item']])
+	
+
+
+
+
+	
+	rseps.input_data(estimate_input=[formwork_code,serial(index),0,f'shuttering at beam no {a["id"]}',a['length'],a['depth_of_beam'],None,a['length']*a['depth_of_beam'],2*a['no_of_item']])
+	
+	
+	rseps.input_data(estimate_input=[formwork_code,serial(index),0,f'shuttering at beam no {a["id"]}',a['length'],a['width'],None,a['length']*a['width'],1*a['no_of_item']])
+	##
+	
+	rseps.input_data(estimate_input=[poly_code,serial(index),0,f'polythene at beam no {a["id"]}',a['length'],a['depth_of_beam'],None,a['length']*a['depth_of_beam'],2*a['no_of_item']])
+	
+	
+	rseps.input_data(estimate_input=[poly_code,serial(index),0,f'polythene at beam no {a["id"]}',a['length'],a['width'],None,a['length']*a['width'],1*a['no_of_item']])
+	#######ext top and ext bottom & hanger
+	if a['no_of_ext_top']!=0:
+		
+		rseps.input_data(estimate_input=[rod_code,serial(index),0,f'ext tops at beam no {a["id"]}',a['ext_top_length'],stirrup_rod_unit,a['no_of_ext_top'],a['no_of_ext_top']*a['ext_top_length']*stirrup_rod_unit,1*a['no_of_item']])
+	if a['no_of_ext_bottom']!=0:	
+		
+		rseps.input_data(estimate_input=[rod_code,serial(index),0,f'ext bottoms at beam no {a["id"]}',a['ext_bottom_length'],stirrup_rod_unit,a['no_of_ext_bottom'],a['no_of_ext_bottom']*a['ext_bottom_length']*stirrup_rod_unit,1*a['no_of_item']])
+	if a['no_of_hanger']!=0:
+		
+		rseps.input_data(estimate_input=[rod_code,serial(index),0,f'hangers at beam no {a["id"]}',a['length'],stirrup_rod_unit,a['no_of_hanger'],a['no_of_hanger']*a['length']*stirrup_rod_unit,1*a['no_of_item']])
+		
+
+def rcc_fn(index,a):
+	if a['cost_level']=='low':
+		rcc_code='5.05.02.01'
+		poly_code='5.03.05'
+
+	if a['cost_level']=='high':
+		rcc_code='5.05.03.04'
+		poly_code='5.03.05'
+
+	
+	rseps.input_data(estimate_input=[rcc_code,serial(index),0,f'at rcc no {a["id"]}',a['length'],a['width'],a['rcc_thickness'],a['length']*a['width']*a['rcc_thickness'],1*a['no_of_item']])
+	
+	rseps.input_data(estimate_input=[poly_code,serial(index),0,f'polythene at rcc no {a["id"]}',a['length'],a['width'],None,a['length']*a['width'],1*a['no_of_item']])
+	
+def bathroom_accesories_fn(index,a):
+	if a['name']=='wash_basin':
+		if a['cost_level']=='low':
+			
+			rseps.input_data(estimate_input=['7.13.01',serial(index),0,f'wash basin at {a["id"]}',None,None,None,1,1*a['no_of_item']])
+			if a['mirror']=='true':
+				
+				rseps.input_data(estimate_input=['7.19.2',serial(index),0,f'basin mirror at {a["id"]}',None,None,None,1,1*a['no_of_item']])
+			if a['pillar_cock']=='true':
+				
+				rseps.input_data(estimate_input=['7.31.9',serial(index),0,f'Pillar cock no {a["id"]}',None,None,None,1,1*a['no_of_item']])
+			
+			if a['shelf']=='true':
+				
+				rseps.input_data(estimate_input=['7.20',serial(index),0,f'shelf no {a["id"]}',None,None,None,1,1*a['no_of_item']])
+		if a['cost_level']=='high':
+			
+			rseps.input_data(estimate_input=['7.13.09',serial(index),0,f'wash basin at {a["id"]}',None,None,None,1,1*a['no_of_item']])
+			if a['mirror']=='true':
+				
+				rseps.input_data(estimate_input=['7.19.1',serial(index),0,f'basin mirror at {a["id"]}',None,None,None,1,1*a['no_of_item']])
+			if a['pillar_cock']=='true':
+				
+				rseps.input_data(estimate_input=['7.31.9',serial(index),0,f'Pillar cock no {a["id"]}',None,None,None,1,1*a['no_of_item']])
+			
+			if a['shelf']=='true':
+				
+				rseps.input_data(estimate_input=['7.20',serial(index),0,f'shelf no {a["id"]}',None,None,None,1,1*a['no_of_item']])
+			
+			
+	if a['name']=='cock':
+		if a['cost_level']=='low':
+			if a['type']=='bib_cock':
+				
+				rseps.input_data(estimate_input=['7.29.7',serial(index),0,f'Bib cock no {a["id"]}',None,None,None,1,1*a['no_of_item']])
+			if a['type']=='stop_cock':
+				
+				rseps.input_data(estimate_input=['7.30.4',serial(index),0,f'Stop cock no {a["id"]}',None,None,None,1,1*a['no_of_item']])
+			if a['type']=='pillar_cock':
+				
+				rseps.input_data(estimate_input=['7.31.1',serial(index),0,f'Pillar cock no {a["id"]}',None,None,None,1,1*a['no_of_item']])
+			if a['type']=='sink_cock':
+				
+				rseps.input_data(estimate_input=['7.33.1',serial(index),0,f'Sink cock no {a["id"]}',None,None,None,1,1*a['no_of_item']])
+
+		if a['cost_level']=='high':
+			if a['type']=='bib_cock':
+				
+				rseps.input_data(estimate_input=['7.29.5',serial(index),0,f'Bib cock no {a["id"]}',None,None,None,1,1*a['no_of_item']])
+			if a['type']=='stop_cock':
+				
+				rseps.input_data(estimate_input=['7.30.3',serial(index),0,f'Stop cock no {a["id"]}',None,None,None,1,1*a['no_of_item']])
+			if a['type']=='pillar_cock':
+				
+				rseps.input_data(estimate_input=['7.31.9',serial(index),0,f'Pillar cock no {a["id"]}',None,None,None,1,1*a['no_of_item']])
+			if a['type']=='sink_cock':
+				
+				rseps.input_data(estimate_input=['7.33.3',serial(index),0,f'Sink cock no {a["id"]}',None,None,None,1,1*a['no_of_item']])
+
+
+	if a['name']=='grating':
+		if a['cost_level']=='low':
+			
+			rseps.input_data(estimate_input=['7.27.1',serial(index),0,f'Grating no {a["id"]}',None,None,None,1,1*a['no_of_item']])
+			
+		if a['cost_level']=='high':
+			
+			rseps.input_data(estimate_input=['7.27.5',serial(index),0,f'Grating no {a["id"]}',None,None,None,1,1*a['no_of_item']])
+	if a['name']=='shower':
+		if a['cost_level']=='low':
+			
+			rseps.input_data(estimate_input=['7.35.1',serial(index),0,f'shower no {a["id"]}',None,None,None,1,1*a['no_of_item']])
+			
+		if a['cost_level']=='high':
+			
+			rseps.input_data(estimate_input=['7.35.2',serial(index),0,f'shower no {a["id"]}',None,None,None,1,1*a['no_of_item']])
+	if a['name']=='soap_tray':
+		if a['cost_level']=='low':
+			
+			rseps.input_data(estimate_input=['7.24.1',serial(index),0,f'soap tray no {a["id"]}',None,None,None,1,1*a['no_of_item']])
+			
+		if a['cost_level']=='high':
+			
+			rseps.input_data(estimate_input=['7.24.4',serial(index),0,f'soap tray no {a["id"]}',None,None,None,1,1*a['no_of_item']])
+
+	if a['name']=='push_shower':
+		if a['cost_level']=='low':
+			
+			rseps.input_data(estimate_input=['7.39.1',serial(index),0,f'push shower no {a["id"]}',None,None,None,1,1*a['no_of_item']])
+			
+		if a['cost_level']=='high':
+			
+			rseps.input_data(estimate_input=['7.39.1',serial(index),0,f'push shower no {a["id"]}',None,None,None,1,1*a['no_of_item']])
+	if a['name']=='bathtub':
+		if a['cost_level']=='low':
+			
+			rseps.input_data(estimate_input=['7.36.2',serial(index),0,f'bathtub no {a["id"]}',None,None,None,1,1*a['no_of_item']])
+			
+			rseps.input_data(estimate_input=['7.38.1',serial(index),0,f'shower head no {a["id"]}',None,None,None,1,1*a['no_of_item']])
+			
+		if a['cost_level']=='high':
+			
+			rseps.input_data(estimate_input=['7.36.2',serial(index),0,f'bathtub no {a["id"]}',None,None,None,1,1*a['no_of_item']])
+			
+			rseps.input_data(estimate_input=['7.38.1',serial(index),0,f'shower head no {a["id"]}',None,None,None,1,1*a['no_of_item']])
+
+	if a['name']=='towel_rail':
+		if a['cost_level']=='low':
+			
+			rseps.input_data(estimate_input=['7.22.3',serial(index),0,f'towel rail no {a["id"]}',None,None,None,1,1*a['no_of_item']])
+			
+		if a['cost_level']=='high':
+			
+			rseps.input_data(estimate_input=['7.22.4',serial(index),0,f'towel rail no {a["id"]}',None,None,None,1,1*a['no_of_item']])
+
+	if a['name']=='tissue_holder':
+		if a['cost_level']=='low':
+			
+			rseps.input_data(estimate_input=['7.23.1',serial(index),0,f'tissue paper holder no {a["id"]}',None,None,None,1,1*a['no_of_item']])
+			
+		if a['cost_level']=='high':
+			
+			rseps.input_data(estimate_input=['7.23.1',serial(index),0,f'tissue paper holder no {a["id"]}',None,None,None,1,1*a['no_of_item']])
+	#############################################################################
+	if a['name']=='toilet_fan':
+		if a['cost_level']=='low':
+			
+			rseps.input_data(estimate_input=['8.09.2.3',serial(index),0,f'exhaust fan no {a["id"]}',None,None,None,1,1*a['no_of_item']])
+			
+		if a['cost_level']=='high':
+			
+			rseps.input_data(estimate_input=['8.09.2.3',serial(index),0,f'exhaust fan no {a["id"]}',None,None,None,1,1*a['no_of_item']])
+
+
+
+
+	if a['name']=='pump_wire':
+		if a['cost_level']=='low' or a['cost_level']=='high':
+			if a['type']=='submersible':
+				if a['hp']==0.5:
+					
+					rseps.input_data(estimate_input=['8.12.1.1',serial(index),0,f'0.5 HP water pump no {a["id"]}',None,None,None,1,1*a['no_of_item']])
+				if a['hp']==1:
+					
+					rseps.input_data(estimate_input=['8.12.1.2',serial(index),0,f'1 HP water pump no {a["id"]}',None,None,None,1,1*a['no_of_item']])
+				if a['hp']==3:
+					
+					rseps.input_data(estimate_input=['8.12.1.3',serial(index),0,f'3 HP water pump no {a["id"]}',None,None,None,1,1*a['no_of_item']])
+
+			if a['type']=='centrifugal':
+				if a['hp']==0.5:
+					
+					rseps.input_data(estimate_input=['8.12.1.1',serial(index),0,f'0.5 HP water pump no {a["id"]}',None,None,None,1,1*a['no_of_item']])
+				if a['hp']==1:
+					
+					rseps.input_data(estimate_input=['8.12.1.2',serial(index),0,f'1 HP water pump no {a["id"]}',None,None,None,1,1*a['no_of_item']])
+				if a['hp']==3:
+					
+					rseps.input_data(estimate_input=['8.12.1.3',serial(index),0,f'3 HP water pump no {a["id"]}',None,None,None,1,1*a['no_of_item']])
+
+			if a['upvc_150mm']!=0:
+				
+				rseps.input_data(estimate_input=['7.43.3',serial(index),0,f'150 mm upvc pipe no {a["id"]}',a['upvc_150mm'],None,None,a['upvc_150mm'],1*a['no_of_item']])
+			if a['upvc_100mm']!=0:
+				
+				rseps.input_data(estimate_input=['7.43.2',serial(index),0,f'100 mm upvc pipe no {a["id"]}',a['upvc_100mm'],None,None,a['upvc_100mm'],1*a['no_of_item']])
+			if a['upvc_75mm']!=0:
+				
+				rseps.input_data(estimate_input=['7.45.7',serial(index),0,f'75 mm upvc pipe no {a["id"]}',a['upvc_75mm'],None,None,a['upvc_75mm'],1*a['no_of_item']])
+			if a['upvc_50mm']!=0:
+				
+				rseps.input_data(estimate_input=['7.43.1',serial(index),0,f'50 mm upvc pipe no {a["id"]}',a['upvc_50mm'],None,None,a['upvc_50mm'],1*a['no_of_item']])
+			if a['upvc_40mm']!=0:
+				
+				rseps.input_data(estimate_input=['7.45.5',serial(index),0,f'40 mm upvc pipe no {a["id"]}',a['upvc_40mm'],None,None,a['upvc_40mm'],1*a['no_of_item']])
+			if a['upvc_20mm']!=0:
+				
+				rseps.input_data(estimate_input=['7.45.2',serial(index),0,f'20 mm upvc pipe no {a["id"]}',a['upvc_20mm'],None,None,a['upvc_20mm'],1*a['no_of_item']])
+			if a['gi_pipe']!=0:
+				
+				rseps.input_data(estimate_input=['7.42.6',serial(index),0,f'GI pipe no {a["id"]}',a['gi_pipe'],None,None,a['gi_pipe'],1*a['no_of_item']])
+			if a['electric_wire']!=0:
+				
+				rseps.input_data(estimate_input=['8.05.04.2',serial(index),0,f'electric_wire no {a["id"]}',a['electric_wire'],None,None,a['electric_wire'],1*a['no_of_item']])
+
+	if a['name']=='generator':
+		if a['cost_level']=='low':
+			
+			rseps.input_data(estimate_input=['12.15.01.01',serial(index),0,f'3KVA mini petrol engine generator no {a["id"]}',None,None,None,1,0.0695*a['no_of_item']])
+			
+			rseps.input_data(estimate_input=['8.05.04.2',serial(index),0,f'electric_wire no {a["id"]}',20,None,None,20,1*a['no_of_item']])
+
+		if a['cost_level']=='high':
+			
+			rseps.input_data(estimate_input=['12.15.01.01',serial(index),0,f'5.5KVA petrol engine generator no {a["id"]}',None,None,None,1,0.0397*a['no_of_item']])
+			
+			rseps.input_data(estimate_input=['8.05.04.2',serial(index),0,f'electric_wire no {a["id"]}',20,None,None,20,1*a['no_of_item']])
+
+	if a['name']=='gazi_tank':
+		if a['cost_level']=='low' or a['cost_level']=='high':
+			if a['capacity']==1000:
+				
+				rseps.input_data(estimate_input=['7.58.1',serial(index),0,f'GAZI tank no {a["id"]}',None,None,None,1,1*a['no_of_item']])
+				
+			if a['capacity']==2000:
+				
+				rseps.input_data(estimate_input=['7.58.3',serial(index),0,f'GAZI tank no {a["id"]}',None,None,None,1,1*a['no_of_item']])
+				
+
+def CI_sheet_frame_fn(index,a):
+	if a['cost_level']=='low':
+		sheet_code='5.09.01.21'
+		log_code='5.07.10.1'
+		ridge_code='5.09.01.22.1'
+	if a['cost_level']=='high':
+		sheet_code='5.09.01.21'
+		log_code='5.07.10.3'
+		ridge_code='5.09.01.22.1'
+	########################################
+	ht_vert=a['length']*0.3
+	if ht_vert>2:
+		ht_vert=2
+	length_tr=a['length']*0.3
+	if length_tr>2:
+		length_tr=2
+
+	ht_inclined=((ht_vert)**2+length_tr**2)**0.5
+	extends=.43
+	#edge frame
+	log1=((a['width']/2)**2+ht_inclined**2)**0.5+extends
+	
+	rseps.input_data(estimate_input=[log_code,serial(index),0,f'frame member triangle side1 at {a["id"]}',log1,a['frame_member_side1'],a['frame_member_side2'],log1*a['frame_member_side1']*a['frame_member_side2'],2*a['no_of_item']])
+	log2=((a['width']/2)**2+ht_inclined**2)**0.5+extends
+	
+	rseps.input_data(estimate_input=[log_code,serial(index),0,f'frame member triangle side2 at {a["id"]}',log2,a['frame_member_side1'],a['frame_member_side2'],log2*a['frame_member_side1']*a['frame_member_side2'],2*a['no_of_item']])
+
+	bottom=a['width']
+	
+	rseps.input_data(estimate_input=[log_code,serial(index),0,f'frame member triangle bottom at {a["id"]}',bottom,a['frame_member_side1'],a['frame_member_side2'],bottom*a['frame_member_side1']*a['frame_member_side2'],2*a['no_of_item']])
+
+	bottom_ext=a['width']+0.61
+	
+	rseps.input_data(estimate_input=[log_code,serial(index),0,f'frame member triangle bottom extends at {a["id"]}',bottom_ext,a['frame_member_side1'],a['frame_member_side2'],bottom_ext*a['frame_member_side1']*a['frame_member_side2'],2*a['no_of_item']])
+
+	#longi frame
+	top=a['length']-2*length_tr  #1
+	
+	rseps.input_data(estimate_input=[log_code,serial(index),0,f'frame member longitudinal top at {a["id"]}',top,a['frame_member_side1'],a['frame_member_side2'],top*a['frame_member_side1']*a['frame_member_side2'],1*a['no_of_item']])
+
+	bottom_longi=a['length']  #2
+	
+	rseps.input_data(estimate_input=[log_code,serial(index),0,f'frame member longitudinal bottom at {a["id"]}',bottom_longi,a['frame_member_side1'],a['frame_member_side2'],bottom_longi*a['frame_member_side1']*a['frame_member_side2'],2*a['no_of_item']])
+
+	bottom_longi_ext=a['length']+0.61 #2
+	
+	rseps.input_data(estimate_input=[log_code,serial(index),0,f'frame member longitudinal bottom extends at {a["id"]}',bottom_longi_ext,a['frame_member_side1'],a['frame_member_side2'],bottom_longi_ext*a['frame_member_side1']*a['frame_member_side2'],2*a['no_of_item']])
+
+	no_of_rafter=round((a['width']/2)/0.61)
+	rafter_length_arr=[]  #2
+	for i in range(no_of_rafter):
+		first=top
+		second=2*(no_of_rafter-i)*.61*((bottom_longi-top)/2)/(a['width']/2)
+		tot_len=first+second
+		
+		rseps.input_data(estimate_input=[log_code,serial(index),0,f'frame member longitudinal intermediate rafter no:{i} at {a["id"]}',tot_len,a['frame_member_side1'],a['frame_member_side2'],tot_len*a['frame_member_side1']*a['frame_member_side2'],2*a['no_of_item']])
+
+
+		rafter_length_arr.append(first+second)
+
+
+	#across
+	length_ac=((a['width']/2)**2+ht_vert**2)**0.5
+	no_of_ac=round(a['length']/0.61) #2
+	
+	rseps.input_data(estimate_input=[log_code,serial(index),0,f'frame member perlin at {a["id"]}',length_ac,a['frame_member_side1'],a['frame_member_side2'],length_ac*a['frame_member_side1']*a['frame_member_side2'],no_of_ac*2*a['no_of_item']])
+
+
+	#sheet
+	#triangles
+	ar1=a['width']*ht_inclined
+	
+	rseps.input_data(estimate_input=[sheet_code,serial(index),0,f'CI sheet triangular sides at {a["id"]}',a['width'],ht_inclined,None,a['width']*ht_inclined,2*a['no_of_item']])
+
+
+	#2 sides
+	ht_inclined2=((a['width']/2)**2+ht_vert**2)**0.5
+	ar3=0.5*(top+bottom_longi)*ht_inclined2 #2
+	
+	rseps.input_data(estimate_input=[sheet_code,serial(index),0,f'CI sheet trapizoidal sides at {a["id"]}',0.5*(top+bottom_longi),ht_inclined2,None,0.5*(top+bottom_longi)*ht_inclined2,2*a['no_of_item']])
+
+
+
+	#extends sheet
+	ar5=(bottom_longi*.304) #2
+	
+	rseps.input_data(estimate_input=[sheet_code,serial(index),0,f'CI sheet trapizoidal sides extends at {a["id"]}',bottom_longi,.304,None,bottom_longi*.304,2*a['no_of_item']])
+
+	ar6=(a['width']-.61)*.304 #2
+	
+	rseps.input_data(estimate_input=[sheet_code,serial(index),0,f'CI sheet triangular sides extends at {a["id"]}',(a['width']-.61),.304,None,(a['width']-.61)*.304,2*a['no_of_item']])
+
+	#ridges
+	
+	rseps.input_data(estimate_input=[ridge_code,serial(index),0,f'CI ridge on top at {a["id"]}',top,None,None,top,1*a['no_of_item']])
+
+	
+	rseps.input_data(estimate_input=[ridge_code,serial(index),0,f'CI ridge on triangular sides at {a["id"]}',log1,None,None,log1,4*a['no_of_item']])
+
+	
+	rseps.input_data(estimate_input=[ridge_code,serial(index),0,f'CI ridge on longitudinal sides for rain water at {a["id"]}',(a['length']+.61),None,None,(a['length']+.61),2*a['no_of_item']])
+
+	
+	rseps.input_data(estimate_input=[ridge_code,serial(index),0,f'CI ridge on short sides for rain water at {a["id"]}',(a['width']-.61),None,None,(a['width']-.61),2*a['no_of_item']])
+
+
+	#############
+	
+
+	
+all_data=[]
+for row in str_all_data:
+	ats=[]
+	for items in row:
+		try:
+			items=float(items)
+			ats.append(items)
+		except:
+			ats.append(items)
+	all_data.append(ats)
+#print(all_data)
+my_dic_list=[]
+for j in range(len(all_data)):
+	tr_dic={}
+	for i in range(len(column_names)):
+		tr_dic.update({column_names[i]:all_data[j][i]})
+	my_dic_list.append(tr_dic)
+#print(my_dic_list)     ####this is the whole list of dictionaries all keys in lower case
+index=0
+j2=0
+j3=0
+j4=0
+
+for data in my_dic_list:
+	if data['name']=='joint2':
+		j2+=1
+	if data['name']=='joint3':
+		j3+=1
+	if data['name']=='joint4':
+		j4+=1
+print(j2)
+print(j3)
+print(j4)
+one_time_for_wall_deduction=0
+est_name='From Class'
+for data in my_dic_list:
+	if data['name']=='estimate_name':
+		est_name=data['est_name']
+		break
+
+#rseps=RSEPS(scheme_name=est_name)
+
+#print(rseps.existing_upazila())
+####################
+unique_list=[]
+for data in my_dic_list:
+	if data in unique_list:
+		pass
+	else:
+		unique_list.append(data)
+for data in my_dic_list:
+	data['no_of_item']=0
+
+
+
+no_of_item_arr=[]
+for j in range(len(unique_list)):
+	c=0
+	for i in range(len(my_dic_list)):
+		if my_dic_list[i]==unique_list[j]:
+			c+=1
+	no_of_item_arr.append(c)
+for j in range(len(unique_list)):
+	unique_list[j]['no_of_item']=no_of_item_arr[j]
+############################
+
+
+f=open('serial.txt','w')
+f.write('0')
+f.close()
+for data in unique_list:
+	
+	
+	if data['name']=='CI_sheet_ridge':
+		CI_sheet_ridge(index,data)
+	if data['name']=='DOOR':
+		DOOR(index,data)
+
+	if data['name']=='wood_log':
+		wood_log(index,data)
+	
+	if data['name']=='rod':
+		rod_fn(index,data)	
+	
+	if data['name']=='window':
+		window_fn(index,data)
+	if data['name']=='commode_and_sanitary':
+		commode_and_sanitary_fn(index,data)
+	
+	if data['name']=='inspection_pit':
+		inspection_pit_fn(index,data)
+
+	
+	if data['name']=='septic_tank':
+		septic_tank_fn(index,data)
+	
+	if data['name']=='soak_well':
+		soak_well_fn(index,data)
+	if data['name']=='brick_work_wall':
+		brick_work_wall_fn(index,data,j2,j3,j4,one_time_for_wall_deduction)
+		one_time_for_wall_deduction+=1
+	if data['name']=='Wal_finishings':
+		Wal_finishings_fn(index,data)
+	if data['name']=='formwork_vertical':
+		formwork_vertical_fn(index,data)
+
+	if data['name']=='formwork_plan':
+		formwork_plan_fn(index,data)
+	if data['name']=='floor_finishings':
+		floor_finishings_fn(index,data)
+	if data['name']=='column_with_base':
+		column_with_base_fn(index,data)
+	if data['name']=='beam_rcc_and_rods':
+		beam_rcc_and_rods_fn(index,data)
+	if data['name']=='rcc':
+		rcc_fn(index,data)
+	if data['name']=='CI_sheet_triangle':
+		CI_sheet_triangle_fn(index,data)
+	if data['name']=='ci_ridge':
+		CI_ridge(index,data)
+	if data['name']=='CI_sheet_frame':
+		CI_sheet_frame_fn(index,data)
+	
+	if data['name']=='wash_basin' or data['name']=='cock' or data['name']=='grating' or data['name']=='soap_tray' or data['name']=='push_shower' or data['name']=='bathtub' or data['name']=='towel_rail' or data['name']=='tissue_holder' or data['name']=='toilet_fan' or data['name']=='pump_wire' or data['name']=='generator' or data['name']=='gazi_tank':
+
+		bathroom_accesories_fn(index,data)
+
+	#999
+
+	if data['name']=='tube_well':
+		tube_well_fn(index,data)
