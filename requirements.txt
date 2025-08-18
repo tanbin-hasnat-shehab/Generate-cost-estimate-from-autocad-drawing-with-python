@@ -1,0 +1,4 @@
+customtkinter
+pypyodbc
+requests
+pyinstaller
